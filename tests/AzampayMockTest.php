@@ -1,9 +1,8 @@
 <?php
 
-beforeEach(function (){
+beforeEach(function () {
     // ...
 });
 
 
 test('Azampay using mock handler');
-

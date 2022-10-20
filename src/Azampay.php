@@ -3,6 +3,7 @@
 namespace Alphaolomi\Azampay;
 
 use GuzzleHttp\Client;
+
 // use InvalidArgumentException;
 
 /**
@@ -10,22 +11,21 @@ use GuzzleHttp\Client;
  */
 class Azampay
 {
+    public const SANDBOX_AUTH_BASE_URL = 'https://authenticator-sandbox.azampay.co.tz';
 
-    const SANDBOX_AUTH_BASE_URL = 'https://authenticator-sandbox.azampay.co.tz';
-
-    const SANDBOX_BASE_URL = 'https://sandbox.azampay.co.tz';
+    public const SANDBOX_BASE_URL = 'https://sandbox.azampay.co.tz';
 
     // FIXME: add prod/live base url
 
-    const AUTH_BASE_URL = '';
+    public const AUTH_BASE_URL = '';
 
-    const BASE_URL = '';
+    public const BASE_URL = '';
 
-    const SUPPORTED_MNO = ['Airtel', 'Tigo', 'Halopesa', 'Azampesa'];
+    public const SUPPORTED_MNO = ['Airtel', 'Tigo', 'Halopesa', 'Azampesa'];
 
-    const SUPPORTED_BANK = ['CRDB', 'NMB'];
+    public const SUPPORTED_BANK = ['CRDB', 'NMB'];
 
-    const SUPPORTED_CURRENCY = ['TZS'];
+    public const SUPPORTED_CURRENCY = ['TZS'];
 
 
     protected Client $httpClient;
@@ -69,7 +69,7 @@ class Azampay
         ?Client $httpClient = null
     ) {
         foreach (['appName', 'clientId', 'clientSecret'] as $key) {
-            if (!isset($this->options[$key]) || empty($this->options[$key])) {
+            if (! isset($this->options[$key]) || empty($this->options[$key])) {
                 throw new \InvalidArgumentException("Missing required option: $key");
             }
         }
@@ -93,7 +93,6 @@ class Azampay
         ]);
     }
 
-
     /**
      * Generate Token
      *
@@ -103,7 +102,6 @@ class Azampay
      */
     public function generateToken(): array
     {
-
         try {
             return $this->httpClient->get($this->authBaseUrl . '/AppRegistration/GenerateToken');
         } catch (\Throwable $th) {
@@ -134,9 +132,9 @@ class Azampay
      */
     public function mobileCheckout(array $data)
     {
-        
         try {
             $response = $this->httpClient->request("POST", $this->baseUrl . '/azampay/mno/checkout', $data);
+
             return json_decode($response->body());
         } catch (\Throwable $th) {
             // if ($response->status() === 400) {
@@ -173,6 +171,7 @@ class Azampay
                 $this->baseUrl . '/azampay/mno/checkout',
                 $data
             );
+
             return json_decode($response->body());
         } catch (\Throwable $th) {
             // if ($response->status() === 400) {
