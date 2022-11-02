@@ -4,7 +4,6 @@ namespace Alphaolomi\Azampay;
 
 use Alphaolomi\Azampay\Support\Helper;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 
 // use InvalidArgumentException;
 
@@ -76,7 +75,7 @@ class Azampay
         ?Client $httpClient = null
     ) {
         foreach (['appName', 'clientId', 'clientSecret'] as $key) {
-            if (!isset($this->options[$key]) || empty($this->options[$key])) {
+            if (! isset($this->options[$key]) || empty($this->options[$key])) {
                 throw new \InvalidArgumentException("Missing required option: $key");
             }
         }
@@ -114,6 +113,7 @@ class Azampay
         try {
             $response = $this->httpClient->request("GET", $this->authBaseUrl . '/AppRegistration/GenerateToken');
             $data = $response->body()['data'];
+
             return AccessToken::create($data);
         } catch (\GuzzleHttp\Exception\ClientException $ce) {
             if ($ce->hasResponse()) {
@@ -133,19 +133,20 @@ class Azampay
      */
     public function _getTokenString(null|string|array|AccessToken $accessToken = null): string
     {
-        if (!is_null($accessToken)) {
+        if (! is_null($accessToken)) {
             $_accessToken = AccessToken::create($accessToken);
-            if (!$_accessToken->hasExpired()) {
+            if (! $_accessToken->hasExpired()) {
                 return $accessToken->getToken();
             }
         }
 
-        if (!is_null($this->accessToken)  && !$this->accessToken->hasExpired()) {
+        if (! is_null($this->accessToken) && ! $this->accessToken->hasExpired()) {
             return $this->accessToken->getToken();
         }
 
         $token = $this->generateToken();
         $this->accessToken = $token;
+
         return $token;
     }
 
@@ -169,16 +170,19 @@ class Azampay
      */
     public function mobileCheckout(array $data, string $accessToken = null)
     {
-
         $data["accountNumber"] = Helper::cleanMobileNumber($data["accountNumber"]);
         $data["amount"] = Helper::cleanAmount($data["amount"]);
 
         $_accessToken = $this->_getTokenString($accessToken);
-        try {
 
+        try {
             $response = $this->httpClient->request(
-                "POST", $this->baseUrl . '/azampay/mno/checkout', ["Authorization" => "Bearer {$_accessToken}"], ["body" => $data]
+                "POST",
+                $this->baseUrl . '/azampay/mno/checkout',
+                ["Authorization" => "Bearer {$_accessToken}"],
+                ["body" => $data]
             );
+
             return json_decode($response->body());
         } catch (\GuzzleHttp\Exception\ClientException $ce) {
             if ($ce->hasResponse()) {
@@ -213,6 +217,7 @@ class Azampay
     public function bankCheckout(array $data, string $accessToken = null)
     {
         $data["amount"] = Helper::cleanAmount($data["amount"]);
+
         try {
             $_accessToken = $this->_getTokenString($accessToken);
 

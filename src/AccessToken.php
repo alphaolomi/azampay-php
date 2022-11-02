@@ -2,8 +2,6 @@
 
 namespace Alphaolomi\Azampay;
 
-use InvalidArgumentException;
-
 /**
  * @author Alpha Olomi <alphaolomi@gmail.com>
  */
@@ -22,11 +20,14 @@ class AccessToken
     {
         return new AccessToken($data["token"], $data["expireDate"]);
     }
+
     public function createFromString(string $str)
     {
         $data = json_decode($str);
+
         return new AccessToken($data["token"], $data["expireDate"]);
     }
+
     public static function create(null|string|array|AccessToken $accessToken)
     {
         if ($accessToken instanceof string) {
@@ -35,6 +36,7 @@ class AccessToken
         if (is_array($accessToken)) {
             return AccessToken::createFromArray($accessToken);
         }
+
         return $accessToken;
     }
 
@@ -56,10 +58,9 @@ class AccessToken
     {
         return json_encode([
             "token" => $this->token,
-            "expireDate" => $this->expireDate
+            "expireDate" => $this->expireDate,
         ]);
     }
-
 
     public function hasExpired(): bool
     {
