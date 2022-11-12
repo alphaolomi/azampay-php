@@ -15,7 +15,6 @@ class Helper
      */
     public static function cleanMobileNumber(string $mobileNumber)
     {
-
         $mobileNumber = preg_replace('/[^0-9]/', '', $mobileNumber);
 
         if (strlen($mobileNumber) < 9 || strlen($mobileNumber) > 12) {
@@ -27,7 +26,6 @@ class Helper
             $mobileNumber = str_replace('0', '255', $mobileNumber, 1);
         }
         // fixme: add return
-
     }
 
     /**
