@@ -2,10 +2,9 @@
 
 namespace Alphaolomi\Azampay;
 
-use Alphaolomi\Azampay\Support\Helper;
+use Alphaolomi\Azampay\Support\Helpers;
 use GuzzleHttp\Client;
-
-// use InvalidArgumentException;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @author Alpha Olomi <alphaolomi@gmail.com>
@@ -16,11 +15,9 @@ class Azampay
 
     public const SANDBOX_BASE_URL = 'https://sandbox.azampay.co.tz';
 
-    // FIXME: add prod/live base url
+    public const AUTH_BASE_URL = 'https://authenticator.azampay.co.tz';
 
-    public const AUTH_BASE_URL = '';
-
-    public const BASE_URL = '';
+    public const BASE_URL = 'https://checkout.azampay.co.tz';
 
     public const SUPPORTED_MNO = ['Airtel', 'Tigo', 'Halopesa', 'Azampesa'];
 
@@ -31,14 +28,9 @@ class Azampay
 
     protected Client $httpClient;
 
-    private $baseUrl;
+    private string $baseUrl;
 
-    private $authBaseUrl;
-
-    /**
-     * Sandbox Api Key
-     */
-    private $apiKey;
+    private string $authBaseUrl;
 
     private ?AccessToken $accessToken = null;
 
@@ -80,11 +72,11 @@ class Azampay
             }
         }
 
-        $this->options['environment'] = $this->options['environment'] ?? 'sandbox';
+        $this->options['environment'] = ! isset($this->options['environment']) ?? 'sandbox';
 
         $this->baseUrl = $this->options['environment'] === 'sandbox' ? self::SANDBOX_BASE_URL : self::BASE_URL;
         $this->authBaseUrl = $this->options['environment'] === 'sandbox' ? self::SANDBOX_AUTH_BASE_URL : self::AUTH_BASE_URL;
-        $this->httpClient = $this->makeClient($options, $httpClient);
+        $this->httpClient = $this->makeClient($this->options, $httpClient);
     }
 
     protected function makeClient(array $options, ?Client $client = null): Client
@@ -93,11 +85,14 @@ class Azampay
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
-        if ($options['environment'] === 'sandbox') {
-            $headers['X-API-Key'] = $this->apiToken;
+//        if ($options['environment'] === 'sandbox') {
+//            $headers['X-API-Key'] = $this->apiToken;
+//        }
+        if ($client === null) {
+            $client = new Client(['headers' => $headers,]);
         }
 
-        return ($client instanceof Client) ?? new Client(['headers' => $headers]);
+        return $client;
     }
 
     /**
@@ -105,23 +100,30 @@ class Azampay
      *
      * Generate the access token in order to access Azampay public end points.
      *
-     * @throws \RuntimeException
-     * @return AccessToken
+     * @throws \RuntimeException|\GuzzleHttp\Exception\GuzzleException
      */
-    public function generateToken(): AccessToken
+    public function generateToken()
     {
-        try {
-            $response = $this->httpClient->request("GET", $this->authBaseUrl . '/AppRegistration/GenerateToken');
-            $data = $response->body()['data'];
+        $data = [];
 
-            return AccessToken::create($data);
+        try {
+            $response = $this->httpClient->request(
+                "GET",
+                $this->authBaseUrl . '/AppRegistration/GenerateToken'
+            );
+            $data = json_decode((string)$response->getBody(), true);
+
+            return AccessToken::create($data['data']);
         } catch (\GuzzleHttp\Exception\ClientException $ce) {
             if ($ce->hasResponse()) {
-                if ($ce->getResponse->getStatusCode() === 423) {
+                if ($ce->getResponse()->getStatusCode() === 423) {
                     throw new \RuntimeException('Provided detail is not valid for this app or secret key has been expired');
                 }
             }
         }
+
+//        return AccessToken::create($data);
+        return $data;
     }
 
     /**
@@ -129,7 +131,9 @@ class Azampay
      *
      * Generate the access token in order to access Azampay public end points.
      *
+     * @param string|array|AccessToken|null $accessToken
      * @return string
+     * @throws GuzzleException
      */
     public function _getTokenString(null|string|array|AccessToken $accessToken = null): string
     {
@@ -164,33 +168,34 @@ class Azampay
      *     "provider" =>  "Airtel"
      * ];
      * ```
-     * @throws \RuntimeException
      * @param array $data
-     * @return mixed
+     * @param string|null $accessToken
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function mobileCheckout(array $data, string $accessToken = null)
+    public function mobileCheckout(array $data, string $accessToken = null): array
     {
-        $data["accountNumber"] = Helper::cleanMobileNumber($data["accountNumber"]);
-        $data["amount"] = Helper::cleanAmount($data["amount"]);
+        $data["accountNumber"] = Helpers::cleanMobileNumber($data["accountNumber"]);
+        $data["amount"] = Helpers::cleanAmount($data["amount"]);
+
 
         $_accessToken = $this->_getTokenString($accessToken);
 
-        try {
-            $response = $this->httpClient->request(
-                "POST",
-                $this->baseUrl . '/azampay/mno/checkout',
-                ["Authorization" => "Bearer {$_accessToken}"],
-                ["body" => $data]
-            );
+//        try {
+        $response = $this->httpClient->request(
+            "POST",
+            $this->baseUrl . '/azampay/mno/checkout',
+            ["Authorization" => "Bearer $_accessToken", "json" => $data],
+        );
 
-            return json_decode($response->body());
-        } catch (\GuzzleHttp\Exception\ClientException $ce) {
-            if ($ce->hasResponse()) {
-                if ($ce->getResponse->getStatusCode() === 400) {
-                    throw new \RuntimeException("Permission denied.");
-                }
-            }
-        }
+        return json_decode((string)$response->getBody(), true);
+//        } catch (\GuzzleHttp\Exception\ClientException $ce) {
+//            if ($ce->hasResponse()) {
+//                if ($ce->getResponse()->getStatusCode() === 400) {
+//                    throw new \RuntimeException("Permission denied.");
+//                }
+//            }
+//        }
     }
 
     /**
@@ -210,31 +215,32 @@ class Azampay
      *      "referenceId" => "string"
      * ];
      * ```
-     * @throws \RuntimeException
      * @param array $data
-     * @return mixed
+     * @param string|null $accessToken
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function bankCheckout(array $data, string $accessToken = null)
+    public function bankCheckout(array $data, string $accessToken = null): array
     {
-        $data["amount"] = Helper::cleanAmount($data["amount"]);
+        $data["amount"] = Helpers::cleanAmount($data["amount"]);
 
-        try {
-            $_accessToken = $this->_getTokenString($accessToken);
+//        try {
+        $_accessToken = $this->_getTokenString($accessToken);
 
-            $response = $this->httpClient->request(
-                "POST",
-                $this->baseUrl . '/azampay/mno/checkout',
-                ["Authorization" => "Bearer {$_accessToken}"],
-                ["body" => $data]
-            );
+        $response = $this->httpClient->request(
+            "POST",
+            $this->baseUrl . '/azampay/mno/checkout',
+            ["Authorization" => "Bearer $_accessToken",
+                "json" => $data, ],
+        );
 
-            return json_decode($response->body());
-        } catch (\GuzzleHttp\Exception\ClientException $ce) {
-            if ($ce->hasResponse()) {
-                if ($ce->getResponse->getStatusCode() === 400) {
-                    throw new \RuntimeException("Permission denied.");
-                }
-            }
-        }
+        return json_decode((string)$response->getBody(), true);
+//        } catch (\GuzzleHttp\Exception\ClientException $ce) {
+//            if ($ce->hasResponse()) {
+//                if ($ce->getResponse()->getStatusCode() === 400) {
+//                    throw new \RuntimeException("Permission denied.");
+//                }
+//            }
+//        }
     }
 }

@@ -4,8 +4,9 @@ namespace Alphaolomi\Azampay\Support;
 
 /**
  * @author Alpha Olomi
+ * @version 1.0.0
  */
-class Helper
+class Helpers
 {
     /**
      * Cleans the mobile number to remove any whitespace or dashes
@@ -13,19 +14,25 @@ class Helper
      * @param  string  $mobileNumber
      * @return string
      */
-    public static function cleanMobileNumber(string $mobileNumber)
+    public static function cleanMobileNumber(string $phoneNumber)
     {
-        $mobileNumber = preg_replace('/[^0-9]/', '', $mobileNumber);
+        $mobileNumber = $phoneNumber;
+        $mobileNumber = str_replace(' ', '', $mobileNumber);
+        $mobileNumber = str_replace('-', '', $mobileNumber);
+        // trim
+        $mobileNumber = trim($mobileNumber);
 
         if (strlen($mobileNumber) < 9 || strlen($mobileNumber) > 12) {
             throw new \RuntimeException('Invalid mobile number');
         }
         if (strlen($mobileNumber) == 9 && $mobileNumber[0] != '0') {
             $mobileNumber = "255{$mobileNumber}";
-        } elseif (strlen($mobileNumber) == 10 && $mobileNumber[0] == '0') {
-            $mobileNumber = str_replace('0', '255', $mobileNumber, 1);
+        }
+        if (strlen($mobileNumber) == 10 && $mobileNumber[0] == '0') {
+            $mobileNumber = substr_replace($mobileNumber, '255', 0, 1);
         }
         // fixme: add return
+        return $mobileNumber;
     }
 
     /**
