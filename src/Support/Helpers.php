@@ -19,7 +19,7 @@ class Helpers
         $mobileNumber = $phoneNumber;
         $mobileNumber = str_replace(' ', '', $mobileNumber);
         $mobileNumber = str_replace('-', '', $mobileNumber);
-        // trim
+
         $mobileNumber = trim($mobileNumber);
 
         if (strlen($mobileNumber) < 9 || strlen($mobileNumber) > 12) {
@@ -31,7 +31,7 @@ class Helpers
         if (strlen($mobileNumber) == 10 && $mobileNumber[0] == '0') {
             $mobileNumber = substr_replace($mobileNumber, '255', 0, 1);
         }
-        // fixme: add return
+
         return $mobileNumber;
     }
 
