@@ -1,11 +1,11 @@
 <?php
 
+use Alphaolomi\Azampay\AccessToken;
+use Alphaolomi\Azampay\Azampay;
 use GuzzleHttp\Client;
+
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-
-use Alphaolomi\Azampay\Azampay;
-use Alphaolomi\Azampay\AccessToken;
 
 it('can cant instantiate without clientSecret', function () {
     expect(new Azampay([
@@ -53,7 +53,7 @@ beforeEach(function () {
     /** @var MockHandler */
     $this->mock = new MockHandler([]);
 
-    /** @var  HandlerStack */
+    /** @var HandlerStack */
     $this->handlerStack = HandlerStack::create($this->mock);
 
     /** @var Client */
@@ -107,19 +107,19 @@ it('can use mobile checkout with user\'s accessToken', function () {
 
     $accessToken = AccessToken::create([
         'accessToken' => 'U2FsdGVkX1+q/NDwjNHcDpubTVE/wWT+JytadEaObdtjuukmJqzQ2pcfqpnHZbpn8zi+SLe53bOrrm6h5dhLOP4BTjJknbbnf9iVDBvJFh',
-        'expire' => '2023-11-03T14:12:40Z'
+        'expire' => '2023-11-03T14:12:40Z',
     ]);
 
     $res = $this->azampay->mobileCheckout([
-        "referenceId" => rand(1000,9999),
-        "accountNumber" =>  "255747991498",
-        "amount" =>  "5000",
-        "provider" =>  "Airtel",
-        "additionalProperties" =>  [
-            "name" =>  "Jane Doe",
-            "email" =>  "jane.doe@gmail.com"
+        "referenceId" => rand(1000, 9999),
+        "accountNumber" => "255747991498",
+        "amount" => "5000",
+        "provider" => "Airtel",
+        "additionalProperties" => [
+            "name" => "Jane Doe",
+            "email" => "jane.doe@gmail.com",
         ],
-    ],$accessToken);
+    ], $accessToken);
 
     expect($res)->toBeTruthy();
 });
@@ -130,13 +130,13 @@ it('can use mobile checkout', function () {
     $this->mock->append(stub_response('mobile_checkout'));
 
     $res = $this->azampay->mobileCheckout([
-        "referenceId" => rand(1000,9999),
-        "accountNumber" =>  "255747991498",
-        "amount" =>  "5000",
-        "provider" =>  "Airtel",
-        "additionalProperties" =>  [
-            "name" =>  "Jane Doe",
-            "email" =>  "jane.doe@gmail.com"
+        "referenceId" => rand(1000, 9999),
+        "accountNumber" => "255747991498",
+        "amount" => "5000",
+        "provider" => "Airtel",
+        "additionalProperties" => [
+            "name" => "Jane Doe",
+            "email" => "jane.doe@gmail.com",
         ],
     ]);
 
@@ -152,23 +152,23 @@ it('can use mobile checkout with saved AT', function () {
     $this->mock->append(stub_response('mobile_checkout'));
 
     $res = $this->azampay->mobileCheckout([
-        "referenceId" => rand(1000,9999),
-        "accountNumber" =>  "255747991498",
-        "amount" =>  "5000",
-        "provider" =>  "Airtel",
-        "additionalProperties" =>  [
-            "name" =>  "Jane Doe",
-            "email" =>  "jane.doe@gmail.com"
+        "referenceId" => rand(1000, 9999),
+        "accountNumber" => "255747991498",
+        "amount" => "5000",
+        "provider" => "Airtel",
+        "additionalProperties" => [
+            "name" => "Jane Doe",
+            "email" => "jane.doe@gmail.com",
         ],
     ]);
     $res2 = $this->azampay->mobileCheckout([
-        "referenceId" => rand(1000,9999),
-        "accountNumber" =>  "255757991498",
-        "amount" =>  "5000",
-        "provider" =>  "Airtel",
-        "additionalProperties" =>  [
-            "name" =>  "Jane Doe",
-            "email" =>  "jane.doe@gmail.com"
+        "referenceId" => rand(1000, 9999),
+        "accountNumber" => "255757991498",
+        "amount" => "5000",
+        "provider" => "Airtel",
+        "additionalProperties" => [
+            "name" => "Jane Doe",
+            "email" => "jane.doe@gmail.com",
         ],
     ]);
 
@@ -189,10 +189,10 @@ it('can use bankCheckout checkout', function () {
         "merchantName" => "Abc demo",
         "otp" => "1025",
         "provider" => "CRDB",
-        "referenceId" => rand(1000,9999),
-        "additionalProperties" =>  [
-            "name" =>  "Jane Doe",
-            "email" =>  "jane.doe@gmail.com"
+        "referenceId" => rand(1000, 9999),
+        "additionalProperties" => [
+            "name" => "Jane Doe",
+            "email" => "jane.doe@gmail.com",
         ],
 
     ]);

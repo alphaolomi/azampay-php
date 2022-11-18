@@ -12,7 +12,7 @@ class AccessToken
     // "2022-11-03T14:12:40Z"
     private \DateTime $expire;
 
-    const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
+    public const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
     public function __construct(string $accessToken, string $expire)
     {
@@ -29,6 +29,7 @@ class AccessToken
     {
         try {
             $data = json_decode($str, true, 512, JSON_THROW_ON_ERROR);
+
             return new AccessToken($data["accessToken"], $data["expire"]);
         } catch (\JsonException $e) {
             throw new \InvalidArgumentException("Invalid json string");

@@ -18,5 +18,6 @@ function _stub_response($body)
 function stub_response_body(string $name)
 {
     $path = __DIR__ . "/stubs/$name.json";
+
     return file_get_contents($path);
 }

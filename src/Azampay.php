@@ -67,12 +67,12 @@ class Azampay
         ?Client $httpClient = null
     ) {
         foreach (['appName', 'clientId', 'clientSecret'] as $key) {
-            if (!isset($this->options[$key]) || empty($this->options[$key])) {
+            if (! isset($this->options[$key]) || empty($this->options[$key])) {
                 throw new \InvalidArgumentException("Missing required option: $key");
             }
         }
 
-        $this->options['environment'] = !isset($this->options['environment']) ?? 'sandbox';
+        $this->options['environment'] = ! isset($this->options['environment']) ?? 'sandbox';
 
         $this->baseUrl = $this->options['environment'] === 'sandbox' ? self::SANDBOX_BASE_URL : self::BASE_URL;
         $this->authBaseUrl = $this->options['environment'] === 'sandbox' ? self::SANDBOX_AUTH_BASE_URL : self::AUTH_BASE_URL;
@@ -135,7 +135,7 @@ class Azampay
     public function _getTokenString(null|string|array|AccessToken $accessToken = null): string
     {
         // if given token is not null
-        if (!is_null($accessToken)) {
+        if (! is_null($accessToken)) {
             $_accessToken = AccessToken::create($accessToken);
             // fixme: if (!$_accessToken->hasExpired()) {
             // save given token
@@ -147,7 +147,7 @@ class Azampay
 
         // saved token is not null
         // fixme: && !$this->accessToken->hasExpired()
-        if (!is_null($this->accessToken)) {
+        if (! is_null($this->accessToken)) {
             // use saved AT
             return $this->accessToken->getToken();
         }

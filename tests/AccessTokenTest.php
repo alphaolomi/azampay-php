@@ -2,7 +2,6 @@
 
 use Alphaolomi\Azampay\AccessToken;
 
-
 it('can instantiate access Token', function () {
     $accessToken = new AccessToken(
         accessToken: 'U2FsdGVkX1+q/NDwjNHcDpubTVE/wWT+JytadEaObdtjuukmJqzQ2pcf',
@@ -16,7 +15,7 @@ it('can instantiate access Token', function () {
 
 it('will return if at is given', function () {
     $_accessToken = AccessToken::create('{"accessToken":"U2FsdGVkX1+q/NDwjNHcDpubTVE/wWT+Jytad","expire":"2022-11-03T14:12:40Z"}');
-    $accessToken=  AccessToken::create($_accessToken);
+    $accessToken = AccessToken::create($_accessToken);
     expect($accessToken->getToken())->toBeString();
     expect($accessToken->getExpireDate()
         ->format('Y-m-d\TH:i:s\Z'))->toBe('2022-11-03T14:12:40Z');
@@ -36,7 +35,7 @@ it('will throw if creating from bad json string', function () {
 it('can create from array', function () {
     $accessToken = AccessToken::create([
         'accessToken' => 'U2FsdGVkX1+q/NDwjNHcDpubTVE/wWT+JytadEaObdtjuukmJqzQ2pcfqpnHZbpn8zi+SLe53bOrrm6h5dhLOP4BTjJknbbnf9iVDBvJFh',
-        'expire' => '2022-11-03T14:12:40Z'
+        'expire' => '2022-11-03T14:12:40Z',
     ]);
     expect($accessToken->getToken())->toBeString();
     expect($accessToken->getExpireDate()
