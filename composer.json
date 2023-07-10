@@ -1,9 +1,12 @@
 {
     "name": "alphaolomi/azampay-php",
-    "description": "Azampay in PHP",
+    "description": "AzamPay PHP SDK",
     "keywords": [
         "alphaolomi",
-        "azampay-php"
+        "azampay-php",
+        "azampay",
+        "sdk",
+        "payments"
     ],
     "homepage": "https://github.com/alphaolomi/azampay-php",
     "license": "MIT",
@@ -15,30 +18,33 @@
         }
     ],
     "require": {
-        "php": "^8.0"
+        "php": "^8.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
         "pestphp/pest": "^1.20",
-        "spatie/ray": "^1.28"
+        "friendsofphp/php-cs-fixer": "^3.13"
     },
     "autoload": {
         "psr-4": {
-            "Alphaolomi\\Azampay\\": "src"
+            "AlphaOlomi\\AzampayService\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Alphaolomi\\Azampay\\Tests\\": "tests"
+            "AlphaOlomi\\AzampayService\\Tests\\": "tests"
         }
     },
     "scripts": {
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
